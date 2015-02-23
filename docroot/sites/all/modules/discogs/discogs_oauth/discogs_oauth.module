@@ -1,0 +1,86 @@
+<?php
+
+function discogs_oauth_menu() {
+
+  $items = array();
+  $items['admin/config/content/oauth_settings'] = array(
+    'title' => 'Discography Oauth settings',
+    'description' => 'Discography Oauth administration menu.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('discogs_oauth_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  return $items;
+}
+
+/**
+ * Page callback: Current Discogs OAuth settings
+ *
+ * @see discogs_oauth_menu()
+ */
+function discogs_oauth_admin_settings() {
+  $form['discogs_oauth_settings_consumer_key'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Consumer key'),
+    '#default_value' => variable_get('discogs_oauth_settings_consumer_key'),
+    '#size' => 75,
+    '#pxlength' => 75,
+    '#description' => t('consumer key from your Discogs API application'),
+  );    
+  $form['discogs_oauth_settings_consumer_secret'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Consumer secret'),
+    '#default_value' => variable_get('discogs_oauth_settings_consumer_secret'),
+    '#size' => 75,
+    '#pxlength' => 75,
+    '#description' => t('consumer secret from your Discogs API application'),
+  );  
+  $form['discogs_oauth_settings_token'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Access token'),
+    '#default_value' => variable_get('discogs_oauth_settings_token'),
+    '#size' => 75,
+    '#pxlength' => 75,
+    '#description' => t('OAuth access token from successful series of requests to Discogs API endpoint'),
+  );
+  $form['discogs_oauth_settings_token_secret'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Access token secret'),
+    '#default_value' => variable_get('discogs_oauth_settings_token_secret'),
+    '#size' => 75,
+    '#pxlength' => 75,
+    '#description' => t('OAuth access token secret from successful series of requests to Discogs API endpoint'),
+  );  
+  $form['discogs_oauth_html'] = array(
+    '#markup' => t('To obtain your consumer key, please visit; <a href="https://www.discogs.com/settings/developers" >https://www.discogs.com/settings/developers</a>'), 
+    '#weight' => 10,
+  );
+  return system_settings_form($form);
+}
+
+function discogs_oauth_admin_settings_validate($form, $form_state){
+  dsm($form_state);
+  drupal_set_message($form_state['values']['discogs_oauth_settings_consumer_key'],'status');
+
+  // first, ensure we havent already got values
+  $accessToken = variable_get('discogs_oauth_settings_token');
+  $accessTokenSecret = variable_get('discogs_oauth_settings_token_secret');
+  $url = 'https://api.discogs.com/oauth/request_token';
+  $headers = array(
+    'Authorization' => 'OAuth oauth_consumer_key="your_consumer_key",
+        oauth_nonce="random_string_or_timestamp",
+        oauth_signature="your_consumer_secret&",
+        oauth_signature_method="PLAINTEXT",
+        oauth_timestamp="current_timestamp",
+        oauth_callback="your_callback"',
+    'User-Agent' => 'DiscogsProv/7.x-1.x +http://drupal.org/project/discogs',
+  );
+  if (empty($accessToken) || empty($accessToken)){
+    $json = _discogs_prov_http_request($url, $query_data);
+  }
+ 
+
+    
+   
+}

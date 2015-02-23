@@ -1,0 +1,7 @@
+name = Discogs OAuth settings
+description = Discogs OAuth settings form
+core = 7.x
+package = Discography
+dependencies[] = discogs
+dependencies[] = discogs_prov
+files[] = discog_mediator.module
