@@ -353,7 +353,7 @@ function discogs_prov_discog_fetch_release($id) {
  * @param $base Base URI part of URL (scheme and path)
  * @param query Array of key/value query pairs, passed to http_build_query()
  */
-function _discogs_prov_http_request($base, $query_data = array()) {
+function _discogs_prov_http_request($base, $query_data = array(), $headers) {
   $json_array = array();
   // Build the fully-qualified URL
   $url = $base;
@@ -361,6 +361,7 @@ function _discogs_prov_http_request($base, $query_data = array()) {
     $url .= '?' . http_build_query($query_data);
   }
   // Discogs.com requires a descriptive user-agent
+  // need to set a loop in here to properly handle headers
   $options = array(
     'User-Agent' => 'DiscogsProv/7.x-1.x +http://drupal.org/project/discogs',
   );

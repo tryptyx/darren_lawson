@@ -1,5 +1,19 @@
 <?php
 
+/**
+ * @file
+ * This sub module provides Oauth comunication with the Doscogs API
+ *
+ * Pseudo Code:
+ * Creates the menu configuration page
+ * On page submit it checks if the Access Token & Access Secret are stored
+ * as a system variable, if not then it will make the call to Discogs
+ * to authorise. This only needs to be done once.
+ *
+ *
+ *
+ */
+
 function discogs_oauth_menu() {
 
   $items = array();
@@ -63,24 +77,37 @@ function discogs_oauth_admin_settings_validate($form, $form_state){
   dsm($form_state);
   drupal_set_message($form_state['values']['discogs_oauth_settings_consumer_key'],'status');
 
+  $consumerKey    = variable_get('discogs_oauth_settings_consumer_key');
+  $consumerSecret = variable_get('discogs_oauth_settings_consumer_secret');
+  $accessToken         = variable_get('discogs_oauth_settings_token');
+  $accessTokenSecret   = variable_get('discogs_oauth_settings_token_secret');
+
+  $timestamp = time();
   // first, ensure we havent already got values
-  $accessToken = variable_get('discogs_oauth_settings_token');
-  $accessTokenSecret = variable_get('discogs_oauth_settings_token_secret');
-  $url = 'https://api.discogs.com/oauth/request_token';
-  $headers = array(
-    'Authorization' => 'OAuth oauth_consumer_key="your_consumer_key",
-        oauth_nonce="random_string_or_timestamp",
-        oauth_signature="your_consumer_secret&",
-        oauth_signature_method="PLAINTEXT",
-        oauth_timestamp="current_timestamp",
-        oauth_callback="your_callback"',
-    'User-Agent' => 'DiscogsProv/7.x-1.x +http://drupal.org/project/discogs',
-  );
   if (empty($accessToken) || empty($accessToken)){
+    $url = 'https://api.discogs.com/oauth/request_token';
+    // do we need the ampersand after the secret?
+    $headers = array(
+      'Authorization' => 'OAuth oauth_consumer_key="'.$consumerKey.'",
+        oauth_nonce="'.$timestamp.'",
+        oauth_signature="'.$consumerSecret.'&",
+        oauth_signature_method="PLAINTEXT",
+        oauth_timestamp="'.$timestamp.'"',
+  );
+    $query_data = 
     $json = _discogs_prov_http_request($url, $query_data);
   }
- 
+}
 
-    
-   
+
+/**
+ * Impliments hook_form_submit().
+ *
+ * Checks for previous authentication the communicates with Discogs API
+ * to obtain oAuth keys.
+ */
+
+function discogs_oauth_admin_settings_submit($form){
+
+ 
 }
